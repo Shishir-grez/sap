@@ -1,0 +1,412 @@
+                                           Data Dictionary                         
+
+
+1) Data Dictionary is also called ABAP Dictionary or DDIC.
+
+   SE11 -> Transaction code for Data Dictionary or ABAP Dictionary.
+   SE16->  Transaction code for Data Browser.
+   SE16N-> New Version of SE16
+
+2) Domain -> Tells us about the technical characteristics of a Field/Column.
+    Technical characteristics -> Data type, length.
+
+3) Data Element -> How a field/column will be visible to end user?
+
+4) MANDT -> Client number of SAP system.
+
+  Tables having MANDT field are called as client dependent tables or Client-Specific tables..
+  Tables does not have MANDT field are called as Client Independent tables. 
+
+5)  Data browser/Table view maintenace options ->
+    Display/Maintenance allowed
+    Display/Maintenance not allowed
+    Display/Maintenance allowed with restrictions
+
+6) Size Category -> A table can store how many number of records.
+
+7)  Types of SAP Data ->
+    Master Data-> Which is accessed very frequenty, but changed very rarely. 
+    Transaction Data-> Which is always changing, number of records are continuously increasing.
+    Configuration Data->Is something which we can customize,
+                        Customizing depends on the business Scenario and customer requirements.
+
+   Example -> Company ABC
+  
+              Master Data -> 
+              Employee Data of the Company ABC
+
+              Transaction Data ->
+              Transactions in the Company(Banking transactions,Revenue transactions).
+
+              Configuration Data->
+             (Employee Designation-> Senior Consultant( Vehicle allowance applicable)
+             (Employee Designation-> other than Senior consultant( Vehicle allowance not applicable).
+
+8) Data Class -> Tells us in which portion of database the table data will get store. 
+
+9) Delivery class-> It is used for controlling data transport of tables during installation,
+                    upgrade and transporting between customer systems.  
+                          
+10) TMG( Table Maintenance Generator)
+    Authorization group : &NC&( Any user can maintain the data).
+    Single Step: Only overview screen is applicable
+    Two Step :  Both Overview screen and single screen are applicable.
+
+11) We can maintain data with the help of SM30.
+
+12) Important Points related to TMG.
+    a) Data browser/Table view maintenace options needs to be Display/Maintenance allowed.
+    b) Whenever you add new columns/fields to the table after generation of TMG, The newly added fields
+       will not appear automatically while maintaining data with the help of SM30. 
+       We need to delete the TMG and generate it again.
+    c) Deleting the TMG never delete the table data.
+    d) To delete the TMG, Open the table in Change Mode, otherwise delete button will not be visible.         
+
+
+13) Shortcuts -  CTRL + S = SAVE
+                 CTRL + F2 -> Syntax Check
+                 CTRL + F3 -> Activate
+                 CTRL + SHIFT + F10 -> To check the contents of the table.
+
+ 
+                                        Topic : Primary-Foreign Key Relationship
+
+Primary Key of one table act as a Foreign key in another table.
+
+( Data/Record/Row/Tuple will be always in the primary key table, It may or may not in the foreign key table)
+
+Pre-requisite - Tables should have a common column/field.
+
+Cardinality -> Number of records in key table, correponds to how many number of records in to secondary/foreign key table.
+
+
+                                       Topic : Initial Values Check box in Table
+
+1) We can select the checkbox Initial values for table fields, then the type dependent NOT NULL value be 
+       assigned to that field and the flag for NOT NULL is set to true on database.
+     
+      Path to check : Utilities->Databaseobject->Display) - Refer column NOT NULL and Default.     
+ 
+2)Many databases, will simply initialize the value of a field as NOT NULL even if we are not selecting this checkbox.
+    
+    Scenario: Suppose we added a new column NEW_1 to table ZTORDH_78 and for NEW_1 , the NOT NULL flag is true.
+    First Query will not return any result and the second query will return the result.
+    DATA : lt_ordh_78 TYPE TABLE OF ZTORDH_78.
+            SELECT * FROM  ZTORDH_78
+            INTO TABLE lt_ordh_78
+            WHERE NEW_1 IS NULL.    "No Output
+
+    DATA : lt_ordh_78 TYPE TABLE OF ZTORDH_78.
+            SELECT * FROM  ZTORDH_78
+            INTO TABLE lt_ordh_78
+            WHERE NEW_1 = ' '.       "  Output
+
+    DATA : lt_ordh_78 TYPE TABLE OF ZTORDH_78.
+            SELECT * FROM  ZTORDH_78
+            INTO TABLE lt_ordh_78
+            WHERE NEW_1 IS NOT NULL.    "  Output
+
+
+
+                                        Topic : Types of SAP Database tables
+
+1) Transparent table - There is 1:1 relationship between the ABAP dictionary and the database.( One table in ABAP dictionary corresponds to one table in database)
+2) Pooled table - There is N:1 relationship between the ABAP dictionary and the database.( Many tables in ABAP dictionary corresponds to one table in database)
+3) Cluster table - There is N:1 relationship between the ABAP dictionary and the database.( Many tables in ABAP dictionary corresponds to one table in database )
+
+Pooled -> Primary-foreign key relationship is not required.
+Cluster -> Primary-foreign key relationship is mandatory.
+
+Structure of a Pooled table at the database layer - Tabname Varkey Dataln vardata
+Structure of a cluster table at the database layer - Key Pageno Vardata
+
+
+                                           Topic : Table Buffering
+
+Buffer is a temperory storage on the application layer. 
+It improves the performance when accessing the data records contained in the table. 
+
+Buffering Options:
+
+1) Buffering not allowed-> Table buffering is not performed for the table.
+2) Buffering switched on-> Table buffering is performed for the table.
+3) Buffering allowed, but switched off-> Buffer is allowed but it is switched OFF 
+                                        and can be switched ON anytime according to the requirement of customer.
+ 
+Types of Buffering:
+
+1) Single Record buffering -> Single Record will be in the buffer.
+
+When to Use Single Record Buffering ->
+
+Single-record buffering should be used for tables where only a few records are accessed by specifying the complete key. 
+
+Advantage -> It will ocucupy less memory on the application layer.
+Disadvantage -> Number of iterations will not be reduced between Application layer and database layer, 
+                if we are not fetching the same record.
+
+
+2) Full Buffering -> Full table will be in the buffer.
+
+When to Use Full Record Buffering->
+
+When you decide to fully buffer a table, you must take into account the size of the table,  
+Tables that are best suited to full buffering are frequently accessed and rarely changed.
+
+A table which stores transaction data should not be opted for Full buffering.
+
+Advantage -> Number of iterations between Application and database layer will  be significantly reduced.
+Disadvantage -> It will occupy more memory on the application Layer.
+
+
+3) Generic area buffering -> All Records matches the generic key are loaded in the buffer.
+
+
+When To Use Generic Buffering:
+
+For Generic areas( Language Dependent tables)
+
+Imp Point : The numbers of key field for a generic area buffering is less than the primary keys of the table.
+
+Transaction Code to check the Buffer -> AL12( Path : Monitor->Buffers->Table Buffer->
+
+
+
+
+                                               Topic : Structures
+
+Structures ->  Is a collection of fields/columns of different data type or similar data type.
+
+ZEMP -> EID -> N(10)
+        ENAME ->C(40)
+
+ZEMP1 ->EID -> N(10)
+        ESAL ->N(10)
+
+Difference between table & Structure -> Table has data , Structure does not have any data.
+
+
+Include  -> 1) It is a reusebale Structure.
+            2) We can insert the include structure at any point.
+            3) It is applicable to customer specific tables, It is not applicable to SAP specific tables.
+
+
+Append  -> 1) It is not a reuseable structure.
+           2) It always inserts at the last.
+           3) It is applicable to both customer specific tables and SAP tables.
+
+
+                                                      Topic : INDEX
+
+A Index is created to give the high performance.
+
+Types of Index -> 1)  Primary Index -> Primary Key Will act as a Primary Index.
+                  2)  Secondary Index -> Based upon the requirement , We will create secondary Indexes.
+
+Disadvantage -> Index will occupy space on the database Layer.
+
+
+A Index name is 3 characters long.
+
+Index will store like this - Table name~Index name( Example - ZEMPTABLE~ABC , Where ZEMPTABLE is table name , ABC is Index name).
+
+
+Index for all database systems-> Index will be created on all the databases.
+Index for Selected database systems-> We can choose database, where we want to create the index.
+No database Index-> Index will remove from the database, It's definition will be there.
+
+
+
+                                                       Topic : Views
+
+
+View -> A view is virtual table.
+        A view is a logical database.
+        It does not have any data.
+
+Differece b/w table and View -> Table has data. View does not have any data.
+
+1) Database View -> It is a collection of one or more database tables.
+
+   Pre-requisite -> Tables should have a relationship between them. 
+
+2) Projection View -> It is applicable to single table.
+                      Select those fields which are required.
+
+3) Maintenance View -> It's purpose is to maintain multiple tables.
+
+  Pre-requisite -> Tables should have a relationship between them.  
+   MANDT field is required.
+   
+4) Help view -> It is used in search helps.
+   
+   Pre-requisite -> Tables should have a relationship between them.
+
+Imp Point for Maintenance View and Help View : Not More than one record should exist in the dependent/Secondary table. 
+
+
+Q-1 : In which scenario - Database View = Projection View.
+Answer : If we are creating database view for a single table, In that case Database View = Projection View.
+
+
+Q-2 : In which type of View content button is disabled?
+Answer : Contents button in disabled in Help view. Help view will display the contents when it is used in search help.
+
+
+
+                                                   Topic : Search Help
+
+Search help -> It is also called as F4 help. It's purpose is to display the various 
+               possible values for any Input field.
+
+Types of Search Help -> a) Elementary Search help-> Single search help.
+                        b) Collective search help-> It is a combination of elementary search helps.
+
+Selection Method -> It is the name of the table or name of the view from where we are fetching the data.
+
+Dialog Type ->
+
+Display values Immediately -> Values will display Immediately.
+Dialog with values restriction -> Before displaying the values, restriction dialog will appaer.
+Dialog depends upon set of values -> If the table has less than 100 values ,It will switch to Display values Immediately.
+                                     If the table has greater than 100,It will switch to Dialog with value restriction. 
+
+
+Search Help Parameter - Field of Search Help.
+
+LPOS -> List position( When values got displayed) 
+
+SPOS->  Screen position( Before displaying the values)
+
+Modify -> It's purpose is to modify the data element.
+
+SDI's -> It's purpose is to make any field in the read only mode.
+
+Default value -> To provide the default values.
+
+Importing -> Input
+
+Exporting ->To Export the values from the hit list to the screen fields(Input fields).
+
+Hot Key -> The hot key permits the user to select an elementary search help from the collective search help directly in the 
+
+input field with the short notation
+
+Q-1: What is the pre-requisite for the default value?
+answer : Importing should be unticked.
+
+
+                                         Topic : Lock Objects
+
+Locking -> If multiple users want to change the same data at the same time , 
+           then at a time only one user can change the data. The purpose of locking is to achieve synchronization.
+
+Lock object name should start with E.( EZ or EY).
+
+While creating a Lock Object, SAP automatically create 2 FM's. 
+
+ENQUEUE_Lock Object name -> For Locking.
+DEQUEUE_Lock Object name -> For Unlocking.
+
+Lock Modes : 1) Read Lock( Shared Lock , S) - Others user can view the data, but can not changed the data.
+             2) Write Lock( Exclusive lock , E) - Others user can not view the data and can not changed the data.
+             3) Enhanced Wr‪ite Lock( Exclusive lock without cumulation,X) - Others user can not view the data and can not changed the data + 
+                                                                          It protect the further access for the same transaction.
+
+
+SM12 -> To see the lock entries.
+
+
+
+                                           Topic : Database Utility
+
+1) The database Utility acts as a Interface between the ABAP dictionary and the database.
+2) The database utility allows you to edit database objects.
+3) Transaction Code : SE14
+
+Precaution :
+
+1) Do not Perform any database operation on the table while performing the database utility.
+
+
+                                           
+
+
+
+                                                             
+
+
+
+                                                
+                                                     
+
+
+
+
+
+
+
+
+       
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+                          
+  
+ 
+
+
+
+   
+ 
+
+       
+
+   
+
+
